@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,14 +12,31 @@ import { GifDownloadService } from '../../services/gif-download.service';
   selector: 'app-gif-download-button',
   imports: [MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   template: `
-    <button mat-flat-button type="button" [disabled]="downloading()" (click)="download()">
-      @if (downloading()) {
-        <mat-spinner diameter="18" />
-      } @else {
-        <mat-icon>download</mat-icon>
-      }
-      {{ downloading() ? 'Downloading…' : 'Download' }}
-    </button>
+    @if (iconOnly()) {
+      <button
+        mat-mini-fab
+        type="button"
+        [disabled]="downloading()"
+        [attr.aria-label]="downloading() ? 'Downloading ' + gif().title : 'Download ' + gif().title"
+        [title]="downloading() ? 'Downloading…' : 'Download'"
+        (click)="onDownloadClick()"
+      >
+        @if (downloading()) {
+          <mat-spinner diameter="18" />
+        } @else {
+          <mat-icon>download</mat-icon>
+        }
+      </button>
+    } @else {
+      <button mat-flat-button type="button" [disabled]="downloading()" (click)="onDownloadClick()">
+        @if (downloading()) {
+          <mat-spinner diameter="18" />
+        } @else {
+          <mat-icon>download</mat-icon>
+        }
+        {{ downloading() ? 'Downloading…' : 'Download' }}
+      </button>
+    }
   `,
   styles: `
     mat-spinner {
@@ -33,10 +50,11 @@ export class GifDownloadButton {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly gif = input.required<Gif>();
+  readonly iconOnly = input(false, { transform: booleanAttribute });
 
   protected readonly downloading = signal(false);
 
-  protected download(): void {
+  protected onDownloadClick(): void {
     this.downloading.set(true);
     this.gifDownloadService
       .download(this.gif())

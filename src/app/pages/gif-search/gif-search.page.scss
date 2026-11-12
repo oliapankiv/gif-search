@@ -34,6 +34,7 @@
 }
 
 .card {
+  position: relative;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: var(--mat-sys-corner-medium);
@@ -55,5 +56,24 @@
   a:hover img,
   a:focus-visible img {
     transform: scale(1.05);
+  }
+
+  .download {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover .download,
+  &:focus-within .download {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .download {
+      opacity: 1;
+    }
   }
 }

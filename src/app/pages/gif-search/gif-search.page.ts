@@ -10,6 +10,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 
+import { GifDownloadButton } from '../../components/gif-download-button/gif-download-button';
 import { GIPHY_CONFIG } from '../../config/giphy.config';
 import { GiphyApiService } from '../../services/giphy-api.service';
 
@@ -22,6 +23,7 @@ const SEARCH_DEBOUNCE_MS = 300;
   imports: [
     ReactiveFormsModule,
     RouterLink,
+    GifDownloadButton,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
@@ -88,7 +90,7 @@ export class GifSearchPage {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  protected clear(): void {
+  protected onClearClick(): void {
     this.queryControl.setValue('');
   }
 }

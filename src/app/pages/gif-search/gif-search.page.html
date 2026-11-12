@@ -6,7 +6,7 @@
     <mat-label>Search GIFs</mat-label>
     <input matInput type="search" [formControl]="queryControl" autocomplete="off" />
     @if (queryControl.value) {
-      <button matSuffix mat-icon-button type="button" aria-label="Clear search" (click)="clear()">
+      <button matSuffix mat-icon-button type="button" aria-label="Clear search" (click)="onClearClick()">
         <mat-icon>close</mat-icon>
       </button>
     }
@@ -40,6 +40,7 @@
                 loading="lazy"
               />
             </a>
+            <app-gif-download-button class="download" [gif]="gif" iconOnly />
           </li>
         }
       </ul>

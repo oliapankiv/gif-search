@@ -5,7 +5,7 @@ import { map, Observable } from 'rxjs';
 import { GIPHY_CONFIG } from '../config/giphy.config';
 import { mapGif } from '../mappers/gif.mapper';
 import { Gif } from '../models/gif.model';
-import { GiphyListResponse } from '../models/giphy-api.model';
+import { GiphyListResponse, GiphySingleResponse } from '../models/giphy-api.model';
 import { GifSearchParams } from '../models/gif-search-params.model';
 import { PaginatedResult } from '../models/paginated-result.model';
 
@@ -29,5 +29,11 @@ export class GiphyApiService {
           totalCount: pagination.total_count,
         })),
       );
+  }
+
+  getById(id: string): Observable<Gif> {
+    return this.http
+      .get<GiphySingleResponse>(`${this.config.apiUrl}/gifs/${encodeURIComponent(id)}`)
+      .pipe(map(({ data }) => mapGif(data)));
   }
 }

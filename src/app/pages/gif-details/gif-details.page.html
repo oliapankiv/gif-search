@@ -1,0 +1,102 @@
+<main class="page">
+  <a class="back" mat-button routerLink="/" queryParamsHandling="preserve">
+    <mat-icon>arrow_back</mat-icon>
+    Back to results
+  </a>
+
+  @if (gif.isLoading()) {
+    <div class="state">
+      <mat-spinner diameter="48" aria-label="Loading GIF" />
+    </div>
+  } @else if (errorMessage(); as message) {
+    <div class="state" role="alert">
+      <mat-icon class="state-icon" aria-hidden="true">error</mat-icon>
+      <p>{{ message }}</p>
+      <button mat-stroked-button type="button" (click)="gif.reload()">Try again</button>
+    </div>
+  } @else if (gif.hasValue()) {
+    @let item = gif.value();
+
+    <article class="details">
+      <div class="media">
+        <img
+          [src]="item.original.url"
+          [width]="item.original.width"
+          [height]="item.original.height"
+          [alt]="item.altText"
+        />
+      </div>
+
+      <mat-card class="info" appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>
+            <h1 class="title">{{ item.title }}</h1>
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (item.author; as author) {
+            <div class="author">
+              @if (author.avatarUrl) {
+                <img class="avatar" [src]="author.avatarUrl" width="48" height="48" alt="" />
+              } @else {
+                <mat-icon class="avatar avatar-placeholder" aria-hidden="true">person</mat-icon>
+              }
+              <div>
+                <div class="author-name">
+                  {{ author.displayName }}
+                  @if (author.isVerified) {
+                    <mat-icon class="verified" aria-label="Verified creator">verified</mat-icon>
+                  }
+                </div>
+                @if (author.profileUrl) {
+                  <a class="author-link" [href]="author.profileUrl" target="_blank" rel="noopener noreferrer">
+                    &#64;{{ author.username }}
+                  </a>
+                } @else {
+                  <span class="muted">&#64;{{ author.username }}</span>
+                }
+              </div>
+            </div>
+          } @else {
+            <p class="muted">Author unknown</p>
+          }
+
+          <mat-divider />
+
+          <dl class="meta">
+            <dt>Uploaded</dt>
+            <dd>{{ item.createdAt ? (item.createdAt | date: 'medium') : '—' }}</dd>
+
+            <dt>Rating</dt>
+            <dd>
+              <mat-chip-set aria-label="Content rating">
+                <mat-chip disabled>{{ item.rating }}</mat-chip>
+              </mat-chip-set>
+            </dd>
+
+            <dt>Dimensions</dt>
+            <dd>{{ item.original.width }} × {{ item.original.height }} px</dd>
+
+            <dt>File size</dt>
+            <dd>{{ item.original.size | fileSize }}</dd>
+
+            @if (item.sourceUrl) {
+              <dt>Source</dt>
+              <dd>
+                <a [href]="item.sourceUrl" target="_blank" rel="noopener noreferrer">{{ item.sourceUrl }}</a>
+              </dd>
+            }
+          </dl>
+        </mat-card-content>
+
+        <mat-card-actions class="actions">
+          <a mat-button [href]="item.pageUrl" target="_blank" rel="noopener noreferrer">
+            <mat-icon>open_in_new</mat-icon>
+            View on GIPHY
+          </a>
+        </mat-card-actions>
+      </mat-card>
+    </article>
+  }
+</main>

@@ -31,7 +31,7 @@
       <ul class="grid">
         @for (gif of result.items; track gif.id) {
           <li class="card">
-            <a [href]="gif.pageUrl" target="_blank" rel="noopener" [title]="gif.title">
+            <a [routerLink]="['/gif', gif.id]" queryParamsHandling="preserve" [title]="gif.title">
               <img
                 [src]="gif.preview.url"
                 [width]="gif.preview.width"

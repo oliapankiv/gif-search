@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, linkedSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, linkedSignal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 import { GIPHY_CONFIG } from '../../config/giphy.config';
@@ -20,6 +21,7 @@ const SEARCH_DEBOUNCE_MS = 300;
   selector: 'app-gif-search-page',
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
@@ -33,9 +35,15 @@ const SEARCH_DEBOUNCE_MS = 300;
 })
 export class GifSearchPage {
   private readonly giphyApi = inject(GiphyApiService);
+  private readonly router = inject(Router);
+
+  /** Search state restored from the URL, so returning from a details page keeps the results. */
+  private readonly initialParams = inject(ActivatedRoute).snapshot.queryParamMap;
+  private readonly initialQuery = this.initialParams.get('q')?.trim() ?? '';
+  private readonly initialPage = Math.max(0, (Number(this.initialParams.get('page')) || 1) - 1);
 
   protected readonly pageSize = inject(GIPHY_CONFIG).pageSize;
-  protected readonly queryControl = new FormControl('', { nonNullable: true });
+  protected readonly queryControl = new FormControl(this.initialQuery, { nonNullable: true });
 
   protected readonly query = toSignal(
     this.queryControl.valueChanges.pipe(
@@ -43,10 +51,13 @@ export class GifSearchPage {
       map((value) => value.trim()),
       distinctUntilChanged(),
     ),
-    { initialValue: '' },
+    { initialValue: this.initialQuery },
   );
 
-  protected readonly page = linkedSignal({ source: this.query, computation: () => 0 });
+  protected readonly page = linkedSignal<string, number>({
+    source: this.query,
+    computation: (_, previous) => (previous ? 0 : this.initialPage),
+  });
 
   protected readonly results = rxResource({
     params: () => {
@@ -55,6 +66,18 @@ export class GifSearchPage {
     },
     stream: ({ params }) => this.giphyApi.search(params),
   });
+
+  constructor() {
+    effect(() => {
+      const q = this.query();
+      const page = this.page();
+
+      this.router.navigate([], {
+        queryParams: { q: q || null, page: page > 0 ? page + 1 : null },
+        replaceUrl: true,
+      });
+    });
+  }
 
   protected paginatorLength(totalCount: number): number {
     return Math.min(totalCount, MAX_RESULTS);

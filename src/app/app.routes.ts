@@ -6,5 +6,10 @@ export const routes: Routes = [
     title: 'GIF Search',
     loadComponent: () => import('./pages/gif-search/gif-search.page').then((m) => m.GifSearchPage),
   },
+  {
+    path: 'gif/:id',
+    title: 'GIF details',
+    loadComponent: () => import('./pages/gif-details/gif-details.page').then((m) => m.GifDetailsPage),
+  },
   { path: '**', redirectTo: '' },
 ];

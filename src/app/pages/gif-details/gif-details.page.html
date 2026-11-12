@@ -91,6 +91,7 @@
         </mat-card-content>
 
         <mat-card-actions class="actions">
+          <app-gif-download-button [gif]="item" />
           <a mat-button [href]="item.pageUrl" target="_blank" rel="noopener noreferrer">
             <mat-icon>open_in_new</mat-icon>
             View on GIPHY

@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
 
+import { GifDownloadButton } from '../../components/gif-download-button/gif-download-button';
 import { FileSizePipe } from '../../pipes/file-size.pipe';
 import { GiphyApiService } from '../../services/giphy-api.service';
 import { getErrorMessage } from '../../utils/http-error-message';
@@ -19,6 +20,7 @@ import { getErrorMessage } from '../../utils/http-error-message';
     DatePipe,
     RouterLink,
     FileSizePipe,
+    GifDownloadButton,
     MatButtonModule,
     MatCardModule,
     MatChipsModule,
@@ -31,13 +33,13 @@ import { getErrorMessage } from '../../utils/http-error-message';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GifDetailsPage {
-  private readonly giphyApi = inject(GiphyApiService);
+  private readonly giphyApiService = inject(GiphyApiService);
 
   readonly id = input.required<string>();
 
   protected readonly gif = rxResource({
     params: () => this.id(),
-    stream: ({ params: id }) => this.giphyApi.getById(id),
+    stream: ({ params: id }) => this.giphyApiService.getById(id),
   });
 
   protected readonly errorMessage = computed(() => {

@@ -34,7 +34,7 @@ const SEARCH_DEBOUNCE_MS = 300;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GifSearchPage {
-  private readonly giphyApi = inject(GiphyApiService);
+  private readonly giphyApiService = inject(GiphyApiService);
   private readonly router = inject(Router);
 
   /** Search state restored from the URL, so returning from a details page keeps the results. */
@@ -64,7 +64,7 @@ export class GifSearchPage {
       const query = this.query();
       return query ? { query, page: this.page() } : undefined;
     },
-    stream: ({ params }) => this.giphyApi.search(params),
+    stream: ({ params }) => this.giphyApiService.search(params),
   });
 
   constructor() {

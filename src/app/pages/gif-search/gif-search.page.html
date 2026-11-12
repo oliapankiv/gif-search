@@ -1,0 +1,57 @@
+<main class="page">
+  <h1 class="title">GIF Search</h1>
+
+  <mat-form-field class="search" appearance="outline" subscriptSizing="dynamic">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label>Search GIFs</mat-label>
+    <input matInput type="search" [formControl]="queryControl" autocomplete="off" />
+    @if (queryControl.value) {
+      <button matSuffix mat-icon-button type="button" aria-label="Clear search" (click)="clear()">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
+  </mat-form-field>
+
+  <div class="progress">
+    @if (results.isLoading()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+  </div>
+
+  @if (results.error()) {
+    <p class="message" role="alert">Couldn't load GIFs. Check your connection and API key, then try again.</p>
+  } @else if (!query()) {
+    <p class="message">Type something to find GIFs.</p>
+  } @else if (results.hasValue()) {
+    @let result = results.value();
+
+    @if (result.items.length === 0) {
+      <p class="message">No GIFs found for “{{ query() }}”.</p>
+    } @else {
+      <ul class="grid">
+        @for (gif of result.items; track gif.id) {
+          <li class="card">
+            <a [href]="gif.pageUrl" target="_blank" rel="noopener" [title]="gif.title">
+              <img
+                [src]="gif.preview.url"
+                [width]="gif.preview.width"
+                [height]="gif.preview.height"
+                [alt]="gif.altText"
+                loading="lazy"
+              />
+            </a>
+          </li>
+        }
+      </ul>
+
+      <mat-paginator
+        [length]="paginatorLength(result.totalCount)"
+        [pageIndex]="page()"
+        [pageSize]="pageSize"
+        [hidePageSize]="true"
+        (page)="onPageChange($event)"
+        aria-label="Select page of GIFs"
+      />
+    }
+  }
+</main>
